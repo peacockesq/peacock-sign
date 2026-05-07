@@ -1,0 +1,42 @@
+{
+  "name": "washburn-northrop-savings-401k-qdro",
+  "source": "PyMuPDF/visual inspection from OpenSign test 2026-05-07",
+  "pageCount": 6,
+  "coordinateSystem": "PDF points, origin top-left for anchor observations; convert to OpenSign widget x/y in placement adapter",
+  "fields": [
+    {
+      "role": "alternate_payee",
+      "type": "signature",
+      "page": 6,
+      "anchor": {
+        "x": 114.5,
+        "y": 109.5
+      },
+      "widget": {
+        "width": 180,
+        "height": 34,
+        "xOffset": 0,
+        "yOffset": -27
+      }
+    },
+    {
+      "role": "participant",
+      "type": "signature",
+      "page": 6,
+      "anchor": {
+        "x": 114.5,
+        "y": 169.5
+      },
+      "widget": {
+        "width": 180,
+        "height": 34,
+        "xOffset": 0,
+        "yOffset": -27
+      }
+    }
+  ],
+  "notes": [
+    "OpenSign renders the drawn signature inside the widget box; box must sit above the visible line, not centered on it.",
+    "Do not reuse manual drag coordinates for production templates; anchor the widgets to detected PDF signature lines."
+  ]
+}
