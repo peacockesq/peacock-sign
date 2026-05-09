@@ -1,0 +1,75 @@
+name: ${LEXYSIGN_PROJECT_NAME:-lexysign}
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: ${LEXYSIGN_MONGO_CONTAINER:-lexysign-mongo}
+    restart: unless-stopped
+    command: ["mongod", "--bind_ip_all"]
+    volumes:
+      - lexysign-mongo:/data/db
+    networks:
+      - lexysign
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  server:
+    image: ghcr.io/peacockesq/lexysign-server:${LEXYSIGN_IMAGE_TAG:-staging}
+    container_name: ${LEXYSIGN_SERVER_CONTAINER:-lexysign-server}
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      APP_NAME: LexySign
+      appName: LexySign
+      APP_ID: opensign
+      SERVER_URL: ${HOST_URL}/api/app
+      PUBLIC_URL: ${HOST_URL}
+      PARSE_MOUNT: /app
+      MONGODB_URI: mongodb://mongo:27017/lexysign
+      USE_LOCAL: "true"
+      DISABLE_PUBLIC_ADDADMIN: "true"
+      LEXYSIGN_GIT_SHA: ${LEXYSIGN_GIT_SHA:-unknown}
+      LEXYSIGN_GITHUB_RUN_ID: ${LEXYSIGN_GITHUB_RUN_ID:-manual}
+    volumes:
+      - lexysign-files:/usr/src/app/files
+    networks:
+      - lexysign
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8080', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  client:
+    image: ghcr.io/peacockesq/lexysign-client:${LEXYSIGN_IMAGE_TAG:-staging}
+    container_name: ${LEXYSIGN_CLIENT_CONTAINER:-lexysign-client}
+    restart: unless-stopped
+    depends_on:
+      - server
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - lexysign
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+networks:
+  lexysign:
+    driver: bridge
+
+volumes:
+  lexysign-mongo:
+  lexysign-files:

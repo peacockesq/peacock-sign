@@ -1,4 +1,4 @@
-{$HOST_URL} {
+sign.lexyalgo.com {
   encode zstd gzip
 
   handle_path /api/* {
@@ -6,6 +6,16 @@
   }
 
   reverse_proxy lexysign-client:3000
+}
+
+sign-staging.lexyalgo.com {
+  encode zstd gzip
+
+  handle_path /api/* {
+    reverse_proxy lexysign-staging-server:8080
+  }
+
+  reverse_proxy lexysign-staging-client:3000
 }
 
 lexyalgo.com, www.lexyalgo.com {

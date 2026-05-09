@@ -1,0 +1,74 @@
+name: LexySign CI
+
+on:
+  pull_request:
+    branches: [staging, main, lexysign-hetzner-prep]
+    paths:
+      - 'apps/OpenSign/**'
+      - 'apps/OpenSignServer/**'
+      - 'deploy/lexysign/**'
+      - '.github/workflows/lexysign-*.yml'
+  push:
+    branches: [lexysign-hetzner-prep, staging, main]
+    paths:
+      - 'apps/OpenSign/**'
+      - 'apps/OpenSignServer/**'
+      - 'deploy/lexysign/**'
+      - '.github/workflows/lexysign-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: lexysign-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Server syntax checks
+        run: |
+          node --check apps/OpenSignServer/Utils.js
+          node --check apps/OpenSignServer/cloud/customRoute/billing.js
+          node --check apps/OpenSignServer/billing/stripeClient.js
+          node --check apps/OpenSignServer/cloud/parsefunction/loginWithSupabase.js
+          node --check apps/OpenSignServer/cloud/customRoute/docxtopdf.js
+      - name: Secret pattern scan
+        shell: bash
+        run: |
+          ! git grep -nE 'AKIA|BEGIN (RSA|OPENSSH|PRIVATE)|PFX_BASE64|PASS_PHRASE|SMTP_PASS|STRIPE_SECRET|SUPABASE_SERVICE|CLOUDFLARE|GITHUB_TOKEN' -- ':!package-lock.json' ':!apps/OpenSign/package-lock.json' ':!apps/OpenSignServer/package-lock.json'
+
+  docker-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: client
+            dockerfile: apps/OpenSign/Dockerfile.lexysign
+          - name: server
+            dockerfile: apps/OpenSignServer/Dockerfile.lexysign
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build LexySign ${{ matrix.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: false
+          load: false
+          tags: ghcr.io/peacockesq/lexysign-${{ matrix.name }}:ci-${{ github.sha }}
+          build-args: |
+            REACT_APP_SERVERURL=https://sign-ci.invalid/api/app
+            REACT_APP_APPID=opensign
+            REACT_APP_FORCE_DRAWN_SIGNATURES=false
+            VITE_SUPABASE_URL=https://ci.invalid
+            VITE_SUPABASE_ANON_KEY=ci-placeholder
