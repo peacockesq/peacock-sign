@@ -133,6 +133,7 @@ jobs:
   deploy:
     needs: [select-environment, build-and-push]
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     environment: ${{ needs.select-environment.outputs.target }}
     steps:
       - uses: actions/checkout@v4
@@ -177,8 +178,10 @@ jobs:
             echo "LEXYSIGN_GITHUB_RUN_ID=$GITHUB_RUN_ID"
           } > .deploy.env
           docker login ghcr.io -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' >/dev/null 2>&1 || true
-          docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull server client
-          docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
+          echo "Pulling LexySign images for $TARGET tag $IMAGE_TAG"
+          timeout 1200s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull server
+          timeout 1200s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull client
+          timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
           if docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
             cp Caddyfile /opt/lexysign/deploy/lexysign/Caddyfile
             docker network connect "$NETWORK_NAME" lexysign-caddy 2>/dev/null || true
@@ -190,5 +193,5 @@ jobs:
       - name: Runtime smoke
         shell: bash
         run: |
-          curl -fsSIL --retry 8 --retry-delay 5 "${{ needs.select-environment.outputs.public_url }}/" | sed -n '1,12p'
-          curl -fsSL --retry 8 --retry-delay 5 "${{ needs.select-environment.outputs.public_url }}/api/billing/status" || true
+          curl --max-time 45 -fsSIL --retry 8 --retry-delay 5 "${{ needs.select-environment.outputs.public_url }}/" | sed -n '1,12p'
+          curl --max-time 45 -fsSL --retry 8 --retry-delay 5 "${{ needs.select-environment.outputs.public_url }}/api/billing/status" || true
