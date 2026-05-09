@@ -100,11 +100,11 @@ function AgreementContent(props) {
                 {t("term-cond-p29", { appName: appName })}
               </span>
               <a
-                href="www.opensignlabs.com"
+                href="sign.lexyalgo.com"
                 target="_blank"
                 className="text-blue-700 cursor-pointer"
               >
-                www.opensignlabs.com
+                sign.lexyalgo.com
               </a>
 
               <span>{t("term-cond-p30")}</span>

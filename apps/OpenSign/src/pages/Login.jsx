@@ -30,7 +30,7 @@ import {
 
 function Login() {
   const appName =
-    "OpenSign™";
+    "LexySign";
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();

@@ -30,8 +30,8 @@ const AppLoader = () => {
 };
 function Opensigndrive() {
   const appName =
-    "OpenSign™";
-  const drivename = appName === "OpenSign™" ? "OpenSign™" : "";
+    "LexySign";
+  const drivename = appName === "LexySign" ? "LexySign" : "";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
