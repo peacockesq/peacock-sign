@@ -21,10 +21,16 @@ import {
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
+import {
+  clearSupabaseSession,
+  isSupabaseAuthEnabled,
+  persistSupabaseSession,
+  signInWithPassword
+} from "../auth/supabaseAuth";
 
 function Login() {
   const appName =
-    "OpenSign™";
+    "LexySign";
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -77,7 +83,7 @@ function Login() {
     if (app?.error === "invalid_json") {
       setErrMsg(t("server-down", { appName: appName }));
     } else if (
-      app?.user === "not_exist"
+      app?.user === "not_exist" && !isSupabaseAuthEnabled()
     ) {
       navigate("/addadmin");
     }
@@ -112,7 +118,17 @@ function Login() {
     try {
       setState({ ...state, loading: true });
       localStorage.setItem("appLogo", appInfo.applogo);
-      const _user = await Parse.Cloud.run("loginuser", { email, password });
+      let _user;
+      if (isSupabaseAuthEnabled()) {
+        clearSupabaseSession();
+        const supabaseSession = await signInWithPassword(email, password);
+        persistSupabaseSession(supabaseSession);
+        _user = await Parse.Cloud.run("loginWithSupabase", {
+          accessToken: supabaseSession.access_token
+        });
+      } else {
+        _user = await Parse.Cloud.run("loginuser", { email, password });
+      }
       if (!_user) {
         setState({ ...state, loading: false });
         return;
@@ -442,6 +458,14 @@ function Login() {
                 <div>
                   <form onSubmit={handleLoginBtn} aria-label="Login Form">
                     <h1 className="text-[30px] mt-6">{t("welcome")}</h1>
+                    <div className="my-3 rounded-xl border border-amber-500/40 bg-amber-50 px-4 py-3 text-amber-950 shadow-sm">
+                      <p className="text-sm font-semibold">
+                        90 days free with promo code <span className="font-mono">LEXY90</span>
+                      </p>
+                      <p className="text-xs">
+                        Credit card required. $5/month after the promotional period for up to 1,000 e-signs/month.
+                      </p>
+                    </div>
                     <fieldset>
                       <legend className="text-[12px] text-[#878787]">
                         {t("Login-to-your-account")}

@@ -1,8 +1,15 @@
 import React from "react";
+import logo from "../assets/images/logo.png";
 
 const Loader = () => {
   return (
-    <div className="op-loading op-loading-infinity w-[4rem] text-neutral"></div>
+    <div className="flex items-center justify-center">
+      <img
+        src={logo}
+        alt="LexySign loading"
+        className="w-[4rem] h-[4rem] object-contain animate-pulse"
+      />
+    </div>
   );
 };
 

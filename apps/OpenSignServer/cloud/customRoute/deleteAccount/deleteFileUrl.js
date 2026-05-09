@@ -26,12 +26,20 @@ function createS3Client({ region, accessKeyId, secretAccessKey, endpoint = null 
   return new S3Client(config);
 }
 
-const s3 = createS3Client({
-  region: process.env.DO_REGION,
-  endpoint: process.env.DO_ENDPOINT,
-  accessKeyId: process.env.DO_ACCESS_KEY_ID,
-  secretAccessKey: process.env.DO_SECRET_ACCESS_KEY,
-});
+const hasS3Config = Boolean(
+  process.env.DO_REGION &&
+    process.env.DO_ACCESS_KEY_ID &&
+    process.env.DO_SECRET_ACCESS_KEY &&
+    process.env.DO_SPACE
+);
+const s3 = hasS3Config
+  ? createS3Client({
+      region: process.env.DO_REGION,
+      endpoint: process.env.DO_ENDPOINT,
+      accessKeyId: process.env.DO_ACCESS_KEY_ID,
+      secretAccessKey: process.env.DO_SECRET_ACCESS_KEY,
+    })
+  : null;
 
 // === Helpers ===
 function getS3ParamsFromUrl(fileUrl) {
@@ -46,6 +54,11 @@ function getS3ParamsFromUrl(fileUrl) {
 }
 
 async function deleteS3File(fileUrl) {
+  if (!s3) {
+    console.warn('⚠️ S3 is not configured; skipping remote file delete:', fileUrl);
+    return;
+  }
+
   const params = getS3ParamsFromUrl(fileUrl);
   if (!params) return;
 

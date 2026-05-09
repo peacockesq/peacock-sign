@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { appName, cloudServerUrl, serverAppId } from '../../Utils.js';
+import { appName, brandColor, brandEmailLogo, cloudServerUrl, serverAppId } from '../../Utils.js';
 const serverUrl = cloudServerUrl;
 const APPID = serverAppId;
 const masterKEY = process.env.MASTER_KEY;
@@ -12,8 +12,7 @@ const headers = {
 async function sendDeclineMail(doc, publicUrl, userId, reason) {
   try {
     const TenantAppName = appName;
-    const logo =
-      "<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>";
+    const logo = brandEmailLogo;
 
     const removePrefill =
       doc?.Placeholders?.length > 0 && doc?.Placeholders?.filter(x => x?.Role !== 'prefill');
@@ -31,7 +30,7 @@ async function sendDeclineMail(doc, publicUrl, userId, reason) {
     const subject = `Document "${pdfName}" has been declined by ${signerName}`;
     const body =
       "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
-      `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document declined by ${signerName}</p>` +
+      `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:${brandColor}'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document declined by ${signerName}</p>` +
       `</div><div style='padding:20px;font-family:system-ui;font-size:14px'><p>Dear ${creatorName},</p>` +
       `<p>${pdfName} has been declined by ${signerName} "${signerEmail}" on ${new Date().toLocaleDateString()}.</p>` +
       `<p>Decline Reason: ${reason || 'Not specified'}</p>` +

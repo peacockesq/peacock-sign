@@ -37,8 +37,8 @@ export const RenderReportCell = ({
 }) => {
   const { t } = useTranslation();
   const appName =
-    "Peacock Sign";
-  const drivename = appName === "Peacock Sign" ? "Peacock Sign" : "";
+    "LexySign";
+  const drivename = appName === "LexySign" ? "LexySign" : "";
   switch (col) {
     case "Sr.No":
       return (
@@ -85,7 +85,7 @@ export const RenderReportCell = ({
       return (
         <td key={col} className="p-2 text-center">
           {rowData?.Folder?.Name ||
-            t("sidebar.OpenSign™ Drive", { appName: drivename })}
+            t("sidebar.LexySign Drive", { appName: drivename })}
         </td>
       );
     case "File":

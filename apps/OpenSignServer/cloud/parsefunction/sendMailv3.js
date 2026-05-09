@@ -5,9 +5,18 @@ import Mailgun from 'mailgun.js';
 import { appName, smtpenable, smtpsecure, updateMailCount } from '../../Utils.js';
 import { createTransport } from 'nodemailer';
 import axios from 'axios';
+import { assertCanUseESignUnits, getTenantForExtUser } from '../../billing/entitlements.js';
 async function sendMailProvider(req) {
   const app = appName;
   const extUserId = req.params?.extUserId || '';
+  if (extUserId) {
+    const extUserQuery = new Parse.Query('contracts_Users');
+    const extUser = await extUserQuery.get(extUserId, { useMasterKey: true });
+    const tenant = await getTenantForExtUser(extUser);
+    if (tenant) {
+      await assertCanUseESignUnits(tenant, 1);
+    }
+  }
   const reportMsg = process.env.EMAIL_FOOTER_HTML || '';
 
   const mailgunApiKey = process.env.MAILGUN_API_KEY;
@@ -79,6 +88,9 @@ async function sendMailProvider(req) {
     }
   } catch (err) {
     console.log(`sendmailv3 Error: ${err}`);
+    if (err?.code === Parse.Error.OPERATION_FORBIDDEN) {
+      throw err;
+    }
     if (err) {
       return { status: 'error' };
     }

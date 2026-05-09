@@ -1,0 +1,97 @@
+name: lexysign
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: lexysign-mongo
+    restart: unless-stopped
+    command: ["mongod", "--bind_ip_all"]
+    volumes:
+      - lexysign-mongo:/data/db
+    networks:
+      - lexysign
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ../..
+      dockerfile: apps/OpenSignServer/Dockerfile.lexysign
+    image: ghcr.io/peacockesq/lexysign-server:staging
+    container_name: lexysign-server
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      APP_NAME: LexySign
+      appName: LexySign
+      APP_ID: opensign
+      SERVER_URL: ${HOST_URL}/api/app
+      PUBLIC_URL: ${HOST_URL}
+      PARSE_MOUNT: /app
+      MONGODB_URI: mongodb://mongo:27017/lexysign
+      USE_LOCAL: "true"
+      DISABLE_PUBLIC_ADDADMIN: "true"
+    volumes:
+      - lexysign-files:/usr/src/app/files
+    networks:
+      - lexysign
+
+  client:
+    build:
+      context: ../..
+      dockerfile: apps/OpenSign/Dockerfile.lexysign
+      args:
+        REACT_APP_SERVERURL: ${HOST_URL}/api/app
+        REACT_APP_APPID: opensign
+        REACT_APP_FORCE_DRAWN_SIGNATURES: "false"
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+    image: ghcr.io/peacockesq/lexysign-client:staging
+    container_name: lexysign-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    env_file:
+      - path: .env
+        required: false
+    networks:
+      - lexysign
+
+  caddy:
+    image: caddy:2.10-alpine
+    container_name: lexysign-caddy
+    restart: unless-stopped
+    depends_on:
+      - client
+      - server
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      HOST_URL: ${HOST_URL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - lexysign-caddy-data:/data
+      - lexysign-caddy-config:/config
+    networks:
+      - lexysign
+
+networks:
+  lexysign:
+    driver: bridge
+
+volumes:
+  lexysign-mongo:
+  lexysign-files:
+  lexysign-caddy-data:
+  lexysign-caddy-config:
