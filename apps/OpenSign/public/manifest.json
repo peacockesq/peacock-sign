@@ -1,6 +1,6 @@
 {
-  "short_name": "Peacock Sign",
-  "name": "Peacock Sign",
+  "short_name": "LexySign",
+  "name": "LexySign",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#1f1a12",
+  "theme_color": "#15120B",
   "background_color": "#ffffff"
 }

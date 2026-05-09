@@ -9,7 +9,7 @@ dotenv.config({ quiet: true });
 
 export const cloudServerUrl = 'http://localhost:8080/app';
 export const serverAppId = process.env.APP_ID || 'opensign';
-export const appName = process.env.APP_NAME || 'Peacock Sign';
+export const appName = process.env.APP_NAME || 'LexySign';
 export const prefillDraftDocWidget = ['date', 'textbox', 'checkbox', 'radio button', 'image'];
 export const prefillDraftTemWidget = [
   'date',

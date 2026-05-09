@@ -1,0 +1,9 @@
+{$HOST_URL} {
+  encode zstd gzip
+
+  handle_path /api/* {
+    reverse_proxy lexysign-server:8080
+  }
+
+  reverse_proxy lexysign-client:3000
+}
