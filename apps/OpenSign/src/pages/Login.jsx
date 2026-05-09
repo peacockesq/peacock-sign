@@ -21,6 +21,12 @@ import {
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
+import {
+  clearSupabaseSession,
+  isSupabaseAuthEnabled,
+  persistSupabaseSession,
+  signInWithPassword
+} from "../auth/supabaseAuth";
 
 function Login() {
   const appName =
@@ -77,7 +83,7 @@ function Login() {
     if (app?.error === "invalid_json") {
       setErrMsg(t("server-down", { appName: appName }));
     } else if (
-      app?.user === "not_exist"
+      app?.user === "not_exist" && !isSupabaseAuthEnabled()
     ) {
       navigate("/addadmin");
     }
@@ -112,7 +118,17 @@ function Login() {
     try {
       setState({ ...state, loading: true });
       localStorage.setItem("appLogo", appInfo.applogo);
-      const _user = await Parse.Cloud.run("loginuser", { email, password });
+      let _user;
+      if (isSupabaseAuthEnabled()) {
+        clearSupabaseSession();
+        const supabaseSession = await signInWithPassword(email, password);
+        persistSupabaseSession(supabaseSession);
+        _user = await Parse.Cloud.run("loginWithSupabase", {
+          accessToken: supabaseSession.access_token
+        });
+      } else {
+        _user = await Parse.Cloud.run("loginuser", { email, password });
+      }
       if (!_user) {
         setState({ ...state, loading: false });
         return;

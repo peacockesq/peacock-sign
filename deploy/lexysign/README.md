@@ -33,6 +33,10 @@
 - `deploy/lexysign/.env.example` — no real secrets.
 - `deploy/lexysign/lexysign-generate-env.sh` — generates `.env`, random `MASTER_KEY`, and a throwaway P12 for smoke tests.
 - `apps/OpenSignServer/cloud/customRoute/deleteAccount/deleteFileUrl.js` — guards S3 client creation so local-file deployments can start with `USE_LOCAL=true` and no object-storage credentials.
+- `apps/OpenSignServer/cloud/parsefunction/loginWithSupabase.js` — validates shared Supabase access tokens and bridges them into Parse sessions.
+- `apps/OpenSignServer/billing/*` and `apps/OpenSignServer/cloud/customRoute/billing.js` — Stripe checkout/portal/webhook routes plus monthly usage entitlements.
+- `apps/OpenSign/src/pages/Billing.jsx` — subscription/usage UI.
+- `apps/OpenSignServer/cloud/parsefunction/DocumentBeforesave.js` — enforces active subscription and records e-sign usage when signed documents are created.
 
 ## Deploy runbook
 
@@ -53,7 +57,7 @@ cd /opt/lexysign
 git clone --branch lexysign-hetzner-prep https://github.com/peacockesq/peacock-sign.git .
 cd deploy/lexysign
 HOST_URL=https://sign.lexyalgo.com bash ./lexysign-generate-env.sh
-# edit .env for SMTP before any real users
+# edit .env for Supabase, Stripe, and SMTP before any real users
 # point DNS A record for sign.lexyalgo.com -> 37.27.49.209 before Caddy certificate issuance
 docker compose up -d --build
 ```
@@ -70,19 +74,22 @@ curl -fsSL https://sign.lexyalgo.com/api/app/health || true
 Then browser proof:
 
 1. Load public URL.
-2. Bootstrap/admin login.
-3. Upload PDF.
-4. Place signer fields.
-5. Send signing request.
-6. Complete signer flow.
-7. Download signed PDF and certificate/audit trail.
-8. Confirm API-created document path works.
+2. Login through shared Supabase credentials.
+3. Confirm `/billing` shows subscription status.
+4. Subscribe via Stripe Checkout, then return to LexySign.
+5. Upload PDF.
+6. Place signer fields.
+7. Send signing request.
+8. Complete signer flow.
+9. Download signed PDF and certificate/audit trail.
+10. Confirm API-created document path works.
 
 ## Blockers before public launch
 
 1. DNS for `sign.lexyalgo.com` must point at `37.27.49.209`, or pick a different hostname.
 2. SMTP must be chosen/configured/tested. Mailpit/local capture is not real delivery.
-3. Subscription/billing is not wired. The $5/month / 1,000-sign cap is positioning until payment + usage gating exist.
-4. The generated P12 is smoke-test only. It is not an Adobe-trusted signing certificate.
-5. Backups/retention/object storage need a real decision before customers rely on it.
-6. AGPL obligations apply: modified source must remain available to network users.
+3. Supabase production URL/anon key/server key must be set in `.env` so LexySign attaches to the shared Lexy backend.
+4. Stripe product/price and webhook secret must be set in `.env` before subscriptions can activate.
+5. The generated P12 is smoke-test only. It is not an Adobe-trusted signing certificate.
+6. Backups/retention/object storage need a real decision before customers rely on it.
+7. AGPL obligations apply: modified source must remain available to network users.

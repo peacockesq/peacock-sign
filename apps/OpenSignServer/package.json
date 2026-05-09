@@ -55,6 +55,7 @@
     "rate-limiter-flexible": "^9.1.1",
     "sharp": "^0.34.5",
     "speakeasy": "^2.0.0",
+    "stripe": "^22.1.1",
     "ws": "^8.19.0"
   },
   "type": "module",
