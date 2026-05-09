@@ -193,7 +193,7 @@ jobs:
             timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
           fi
           if docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
-            cp Caddyfile /opt/lexysign/deploy/lexysign/Caddyfile
+            # Caddyfile is already staged in $DEPLOY_PATH/deploy/lexysign and mounted by the caddy service.
             for network in "$NETWORK_NAME" lexysign_lexysign lexysign-staging_lexysign lexy-filing-staging_lexy-staging lexycorpus_default; do
               docker network connect "$network" lexysign-caddy 2>/dev/null || true
             done
