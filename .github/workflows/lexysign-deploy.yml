@@ -142,16 +142,16 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.LEXYSIGN_DEPLOY_SSH_KEY }}" > ~/.ssh/lexysign_deploy_key
           chmod 600 ~/.ssh/lexysign_deploy_key
-          ssh-keyscan -p "${{ vars.LEXYSIGN_DEPLOY_PORT || '22' }}" "${{ vars.LEXYSIGN_DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -T 30 -p "${{ vars.LEXYSIGN_DEPLOY_PORT || '22' }}" "${{ vars.LEXYSIGN_DEPLOY_HOST }}" >> ~/.ssh/known_hosts || true
       - name: Stage deploy files
         shell: bash
         run: |
           tar -czf /tmp/lexysign-deploy.tgz deploy/lexysign/docker-compose.runtime.yml deploy/lexysign/Caddyfile
-          scp -i ~/.ssh/lexysign_deploy_key -P "${{ vars.LEXYSIGN_DEPLOY_PORT || '22' }}" /tmp/lexysign-deploy.tgz "${{ vars.LEXYSIGN_DEPLOY_USER || 'root' }}@${{ vars.LEXYSIGN_DEPLOY_HOST }}:/tmp/lexysign-deploy-${{ github.sha }}.tgz"
+          scp -o StrictHostKeyChecking=accept-new -i ~/.ssh/lexysign_deploy_key -P "${{ vars.LEXYSIGN_DEPLOY_PORT || '22' }}" /tmp/lexysign-deploy.tgz "${{ vars.LEXYSIGN_DEPLOY_USER || 'root' }}@${{ vars.LEXYSIGN_DEPLOY_HOST }}:/tmp/lexysign-deploy-${{ github.sha }}.tgz"
       - name: Deploy on Hetzner
         shell: bash
         run: |
-          ssh -i ~/.ssh/lexysign_deploy_key -p "${{ vars.LEXYSIGN_DEPLOY_PORT || '22' }}" "${{ vars.LEXYSIGN_DEPLOY_USER || 'root' }}@${{ vars.LEXYSIGN_DEPLOY_HOST }}" \
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/lexysign_deploy_key -p "${{ vars.LEXYSIGN_DEPLOY_PORT || '22' }}" "${{ vars.LEXYSIGN_DEPLOY_USER || 'root' }}@${{ vars.LEXYSIGN_DEPLOY_HOST }}" \
             "GITHUB_SHA='${{ github.sha }}' GITHUB_RUN_ID='${{ github.run_id }}' IMAGE_TAG='${{ needs.select-environment.outputs.image_tag }}' TARGET='${{ needs.select-environment.outputs.target }}' PUBLIC_URL='${{ needs.select-environment.outputs.public_url }}' PROJECT_NAME='${{ needs.select-environment.outputs.project_name }}' DEPLOY_PATH='${{ needs.select-environment.outputs.deploy_path }}' CLIENT_CONTAINER='${{ needs.select-environment.outputs.client_container }}' SERVER_CONTAINER='${{ needs.select-environment.outputs.server_container }}' MONGO_CONTAINER='${{ needs.select-environment.outputs.mongo_container }}' NETWORK_NAME='${{ needs.select-environment.outputs.network_name }}' bash -s" <<'REMOTE'
           set -euo pipefail
           mkdir -p "$DEPLOY_PATH/deploy/lexysign"
