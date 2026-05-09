@@ -124,6 +124,8 @@ export default async function docxtopdf(req, res) {
   }
 
   try {
+    const uploadedSizeBytes = req.file.size || req.file.buffer.length;
+
     // ---- Auth: current user ----
     const userRes = await axios.get(`${serverUrl}/users/me`, { headers: sessionHeader });
 
@@ -204,14 +206,14 @@ export default async function docxtopdf(req, res) {
       err?.response?.data?.error || err?.response?.data || err?.message || 'Something went wrong.';
     // Friendly message to the client
     const message =
-      'We are currently experiencing some issues with processing DOCX files. Please upload the PDF version or contact us on support@opensignlabs.com';
+      'We are currently experiencing some issues with processing DOCX files. Please upload the PDF version or contact LexySign support';
 
     if (msg.includes('timed out')) {
       msg =
-        'Document conversion is taking too long. Please try a smaller file or contact support@opensignlabs.com';
+        'Document conversion is taking too long. Please try a smaller file or contact LexySign support';
     } else if (msg.includes('too large') || msg.includes('size')) {
       msg =
-        'File is too large to process. Please reduce the file size or contact support@opensignlabs.com';
+        'File is too large to process. Please reduce the file size or contact LexySign support';
     } else {
       msg = message;
     }

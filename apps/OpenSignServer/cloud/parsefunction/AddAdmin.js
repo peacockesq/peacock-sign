@@ -97,6 +97,10 @@ async function saveUser(userDetails) {
   }
 }
 export default async function AddAdmin(request) {
+  if (process.env.DISABLE_PUBLIC_ADDADMIN?.toLowerCase() === 'true') {
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, 'Public admin bootstrap is disabled.');
+  }
+
   const userDetails = request.params.userDetails;
   const user = await saveUser(userDetails);
 

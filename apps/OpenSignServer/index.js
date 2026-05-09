@@ -12,6 +12,7 @@ import { ApiPayloadConverter } from 'parse-server-api-mail-adapter';
 import S3Adapter from '@parse/s3-files-adapter';
 import FSFilesAdapter from '@parse/fs-files-adapter';
 import { app as customRoute } from './cloud/customRoute/customApp.js';
+import { stripeWebhook } from './cloud/customRoute/billing.js';
 import { exec } from 'child_process';
 import { createTransport } from 'nodemailer';
 import { appName, cloudServerUrl, serverAppId, smtpenable, smtpsecure, useLocal } from './Utils.js';
@@ -168,6 +169,7 @@ export const config = {
 
 export const app = express();
 app.use(cors());
+app.post('/billing/stripe-webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(function (req, res, next) {

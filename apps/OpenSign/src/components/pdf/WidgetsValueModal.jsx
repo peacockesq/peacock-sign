@@ -72,7 +72,9 @@ const fontOptions = [
 ];
 const textInputcls =
   "op-input op-input-bordered op-input-sm focus:outline-none text-base-content hover:border-base-content w-full text-xs";
-const isTabCls = "bg-[#002864] text-white rounded-[15px] px-[10px] py-[4px]";
+const isTabCls = "bg-[#7a5422] text-white rounded-[15px] px-[10px] py-[4px]";
+const forceDrawnSignatures =
+  process.env.REACT_APP_FORCE_DRAWN_SIGNATURES !== "false";
 
 function WidgetsValueModal(props) {
   const dispatch = useDispatch();
@@ -508,7 +510,12 @@ function WidgetsValueModal(props) {
   //function to handle allowed tab in signature pad
   function handleTab() {
     if (["signature", "initials"].includes(currWidgetsDetails.type)) {
-      const signtypes = signatureTypes || [];
+      const signtypes = forceDrawnSignatures
+        ? (signatureTypes || []).map((x) => ({
+            ...x,
+            enabled: x.name === "draw" ? true : false
+          }))
+        : signatureTypes || [];
       const defaultIndex = signtypes?.findIndex(
         (x) =>
           x.name === "default" &&
@@ -530,6 +537,7 @@ function WidgetsValueModal(props) {
         );
         if (
           previousWidgetRes?.tab &&
+          !(forceDrawnSignatures && ["type", "image", "mysignature", "myinitials"].includes(previousWidgetRes?.tab)) &&
           previousWidgetRes?.type === currWidgetsDetails?.type
         ) {
           setIsTab(previousWidgetRes?.tab || "draw");
@@ -570,6 +578,12 @@ function WidgetsValueModal(props) {
     }
   }
   function isTabEnabled(tabName) {
+    if (
+      forceDrawnSignatures &&
+      ["signature", "initials"].includes(currWidgetsDetails?.type)
+    ) {
+      return tabName === "draw";
+    }
     const isEnabled = signatureTypes?.find((x) => x.name === tabName)?.enabled;
     return isEnabled;
   }

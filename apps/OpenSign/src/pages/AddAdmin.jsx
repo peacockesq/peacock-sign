@@ -16,7 +16,7 @@ import { emailRegex } from "../constant/const";
 
 const AddAdmin = () => {
   const appName =
-    "OpenSign™";
+    "LexySign";
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -459,7 +459,7 @@ const AddAdmin = () => {
                         className="underline cursor-pointer ml-1"
                         onClick={() =>
                           openInNewTab(
-                            "https://www.opensignlabs.com/terms-and-conditions"
+                            "https://sign.lexyalgo.com/terms-and-conditions"
                           )
                         }
                       >

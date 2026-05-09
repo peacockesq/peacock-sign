@@ -110,12 +110,12 @@ const Sidebar = () => {
       </div>
       <nav
         className="op-menu op-menu-sm"
-        aria-label="OpenSign Sidebar Navigation"
+        aria-label="LexySign Sidebar Navigation"
       >
         <ul
           className="text-sm"
           role="menubar"
-          aria-label="OpenSign Sidebar Navigation"
+          aria-label="LexySign Sidebar Navigation"
         >
           {menuList.map((item) =>
             !item.children ? (
