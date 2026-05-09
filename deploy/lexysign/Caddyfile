@@ -7,3 +7,37 @@
 
   reverse_proxy lexysign-client:3000
 }
+
+lexyalgo.com, www.lexyalgo.com {
+  encode zstd gzip
+  reverse_proxy lexyalgo-site:3000
+}
+
+staging.lexyalgo.com {
+  encode zstd gzip
+  reverse_proxy lexyalgo-site-staging:3000
+}
+
+filing-staging.esq2u.com {
+  encode zstd gzip
+
+  handle /api/auth* {
+    reverse_proxy lexy-staging-web:3000
+  }
+
+  handle_path /api/* {
+    reverse_proxy lexy-staging-api:8000
+  }
+
+  reverse_proxy lexy-staging-web:3000
+}
+
+sign.peacockesq.com {
+  encode zstd gzip
+
+  handle_path /api/* {
+    reverse_proxy opensign-test-server:8080
+  }
+
+  reverse_proxy opensign-test-client:3000
+}
