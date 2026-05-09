@@ -10,6 +10,10 @@ dotenv.config({ quiet: true });
 export const cloudServerUrl = 'http://localhost:8080/app';
 export const serverAppId = process.env.APP_ID || 'opensign';
 export const appName = process.env.APP_NAME || 'LexySign';
+export const appPublicUrl = process.env.APP_PUBLIC_URL || process.env.PUBLIC_URL || 'https://sign.lexyalgo.com';
+export const brandColor = process.env.APP_BRAND_COLOR || '#d46b0f';
+export const brandLogoUrl = process.env.APP_LOGO_URL || `${appPublicUrl}/lexysign-logo.png`;
+export const brandEmailLogo = `<img src='${brandLogoUrl}' alt='LexySign' height='50' style='padding:20px;max-width:220px;object-fit:contain'/>`;
 export const prefillDraftDocWidget = ['date', 'textbox', 'checkbox', 'radio button', 'image'];
 export const prefillDraftTemWidget = [
   'date',
@@ -215,10 +219,10 @@ export const getSecureUrl = url => {
 };
 
 export const mailTemplate = param => {
-  const themeColor = '#47a3ad';
+  const themeColor = brandColor;
   const subject = `${param.senderName} has requested you to sign "${param.title}"`;
   const AppName = appName;
-  const logo = `<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' />`;
+  const logo = brandEmailLogo;
 
   const body =
     "<html><head><meta http-equiv='Content-Type' content='text/html;charset=UTF-8' /></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background:white;padding-bottom:20px'><div style='padding:10px'>" +

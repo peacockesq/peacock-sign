@@ -2429,7 +2429,7 @@ export const embedWidgetsToDoc = async (
   } else {
     return {
       error:
-        "This pdf is not compatible with opensign please contact <support@opensignlabs.com>"
+        "This PDF is not compatible with LexySign. Please try a flattened PDF or contact LexySign support."
     };
   }
 };
@@ -3560,7 +3560,7 @@ export const flattenPdf = async (pdfFile) => {
 
 export const mailTemplate = (param) => {
   const appName = "LexySign";
-  const logo = `<div style='padding:10px'><img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' /></div>`;
+  const logo = `<div style='padding:10px'><img src='https://sign.lexyalgo.com/lexysign-logo.png' alt='LexySign' height='50' style='max-width:220px;object-fit:contain' /></div>`;
 
   const subject = `${param.senderName} has requested you to sign "${param.title}"`;
   const body =
