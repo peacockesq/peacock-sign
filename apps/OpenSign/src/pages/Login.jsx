@@ -458,6 +458,14 @@ function Login() {
                 <div>
                   <form onSubmit={handleLoginBtn} aria-label="Login Form">
                     <h1 className="text-[30px] mt-6">{t("welcome")}</h1>
+                    <div className="my-3 rounded-xl border border-amber-500/40 bg-amber-50 px-4 py-3 text-amber-950 shadow-sm">
+                      <p className="text-sm font-semibold">
+                        90 days free with promo code <span className="font-mono">LEXY90</span>
+                      </p>
+                      <p className="text-xs">
+                        Credit card required. $5/month after the promotional period for up to 1,000 e-signs/month.
+                      </p>
+                    </div>
                     <fieldset>
                       <legend className="text-[12px] text-[#878787]">
                         {t("Login-to-your-account")}

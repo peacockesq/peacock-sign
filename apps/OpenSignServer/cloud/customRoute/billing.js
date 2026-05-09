@@ -45,6 +45,7 @@ billingRouter.post('/create-checkout-session', async (req, res) => {
       customer: customerId,
       line_items: [{ price: getMonthlyPriceId(), quantity: 1 }],
       allow_promotion_codes: true,
+      payment_method_collection: 'always',
       success_url:
         process.env.STRIPE_SUCCESS_URL || `${publicUrl()}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: process.env.STRIPE_CANCEL_URL || `${publicUrl()}/billing/cancel`,

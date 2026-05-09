@@ -56,6 +56,12 @@ export default function Billing() {
     <div className="op-card bg-base-100 text-base-content shadow-xl max-w-3xl mx-auto my-8">
       <div className="op-card-body">
         <h1 className="op-card-title text-2xl">LexySign Billing</h1>
+        <div className="rounded-xl border border-amber-500/40 bg-amber-50 px-4 py-3 text-amber-950 shadow-sm">
+          <p className="font-semibold">90 days free with code <span className="font-mono">LEXY90</span></p>
+          <p className="text-sm">
+            Enter the promo code at checkout. A credit card is required, then billing starts at $5/month after the promotional period.
+          </p>
+        </div>
         <p className="text-sm opacity-80">
           $5/month includes up to 1,000 e-sign units per billing month via API or UI.
         </p>
