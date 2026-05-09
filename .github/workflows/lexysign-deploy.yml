@@ -182,6 +182,10 @@ jobs:
           timeout 1200s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull server
           timeout 1200s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull client
           if [[ "$TARGET" == "production" ]]; then
+            existing_project=$(docker inspect lexysign-caddy --format '{{ index .Config.Labels "com.docker.compose.project" }}' 2>/dev/null || true)
+            if [[ -n "$existing_project" && "$existing_project" != "$PROJECT_NAME" ]]; then
+              docker rm -f lexysign-caddy >/dev/null 2>&1 || true
+            fi
             COMPOSE_PROFILES=edge timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
           else
             timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
