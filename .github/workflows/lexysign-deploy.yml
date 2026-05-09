@@ -181,10 +181,16 @@ jobs:
           echo "Pulling LexySign images for $TARGET tag $IMAGE_TAG"
           timeout 1200s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull server
           timeout 1200s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull client
-          timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
+          if [[ "$TARGET" == "production" ]]; then
+            COMPOSE_PROFILES=edge timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
+          else
+            timeout 600s docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
+          fi
           if docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
             cp Caddyfile /opt/lexysign/deploy/lexysign/Caddyfile
-            docker network connect "$NETWORK_NAME" lexysign-caddy 2>/dev/null || true
+            for network in "$NETWORK_NAME" lexysign_lexysign lexysign-staging_lexysign lexy-filing-staging_lexy-staging lexycorpus_default; do
+              docker network connect "$network" lexysign-caddy 2>/dev/null || true
+            done
             docker exec lexysign-caddy caddy validate --config /etc/caddy/Caddyfile
             docker exec lexysign-caddy caddy reload --config /etc/caddy/Caddyfile
           fi
