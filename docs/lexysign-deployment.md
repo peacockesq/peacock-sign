@@ -20,8 +20,8 @@ Create GitHub environments named `staging` and `production`.
 Environment secrets:
 
 - `LEXYSIGN_DEPLOY_SSH_KEY` — private deploy key for the Hetzner host.
-- `VITE_SUPABASE_URL` — shared Lexy Supabase URL used at frontend build time.
-- `VITE_SUPABASE_ANON_KEY` — shared Lexy Supabase anon key used at frontend build time.
+- `VITE_SUPABASE_URL` — shared Lexy Supabase URL injected into the frontend container at runtime.
+- `VITE_SUPABASE_ANON_KEY` — shared Lexy Supabase anon key injected into the frontend container at runtime. This is intentionally not passed as a Docker build arg so it is not baked into image metadata or build warnings.
 
 Environment variables:
 
