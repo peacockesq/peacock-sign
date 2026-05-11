@@ -65,7 +65,7 @@ sign.peacockesq.com {
 ingest.lexyalgo.com {
   encode zstd gzip
 
-  @events path /health /v1/events /v1/exports/* /v1/reverse-etl/*
+  @events path /health /v1/events /v1/imports/* /v1/exports/* /v1/reverse-etl/*
   handle @events {
     reverse_proxy uts-ingestion-api:8788
   }
