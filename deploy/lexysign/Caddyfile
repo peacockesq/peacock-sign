@@ -1,11 +1,21 @@
 sign.lexyalgo.com {
   encode zstd gzip
 
+  @uts_exports path /v1/exports/* /v1/reverse-etl/*
+  handle @uts_exports {
+    reverse_proxy uts-ingestion-api:8788
+  }
+
   handle_path /api/* {
     reverse_proxy lexysign-server:8080
   }
 
   reverse_proxy lexysign-client:3000
+}
+
+dashboards.apiaryfoundry.com {
+  encode zstd gzip
+  reverse_proxy uts-grafana:3000
 }
 
 sign-staging.lexyalgo.com {
@@ -52,12 +62,13 @@ sign.peacockesq.com {
   reverse_proxy opensign-test-client:3000
 }
 
-atlas.lexyalgo.com {
+ingest.lexyalgo.com {
   encode zstd gzip
-  reverse_proxy atlas-shell:3000
-}
 
-calc.lexyalgo.com, assetdivider.lexyalgo.com, asset-divider.lexyalgo.com {
-  encode zstd gzip
-  reverse_proxy asset-divider:3000
+  @events path /health /v1/events /v1/exports/* /v1/reverse-etl/*
+  handle @events {
+    reverse_proxy uts-ingestion-api:8788
+  }
+
+  respond "not found" 404
 }
