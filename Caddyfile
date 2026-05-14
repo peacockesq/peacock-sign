@@ -1,4 +1,7 @@
 {$HOST_URL} {
+    handle /growth* {
+        reverse_proxy uts-grafana:3000
+    }
     reverse_proxy client:3000
     handle_path /api/* {
         reverse_proxy server:8080
