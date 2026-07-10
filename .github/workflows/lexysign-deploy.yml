@@ -179,11 +179,14 @@ jobs:
           docker login ghcr.io -u '${{ github.actor }}' -p '${{ secrets.GITHUB_TOKEN }}' >/dev/null 2>&1 || true
           docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml pull server client
           docker compose --env-file .env --env-file .deploy.env -f docker-compose.runtime.yml up -d --remove-orphans
-          if docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
+          if [[ "$TARGET" == "production" ]] && docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
+            # The Caddyfile is shared production edge config. Staging deploys must not overwrite or reload it.
             cp Caddyfile /opt/lexysign/deploy/lexysign/Caddyfile
             docker network connect "$NETWORK_NAME" lexysign-caddy 2>/dev/null || true
             docker exec lexysign-caddy caddy validate --config /etc/caddy/Caddyfile
             docker exec lexysign-caddy caddy reload --config /etc/caddy/Caddyfile
+          elif [[ "$TARGET" != "production" ]]; then
+            echo "Skipping shared Caddyfile copy/reload for $TARGET deploy. Production edge config remains untouched."
           fi
           rm -f "/tmp/lexysign-deploy-${GITHUB_SHA}.tgz"
           REMOTE
