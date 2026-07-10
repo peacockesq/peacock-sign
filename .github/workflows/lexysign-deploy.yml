@@ -4,10 +4,10 @@ on:
   push:
     branches: [staging, main]
     paths:
-      - 'apps/OpenSign/**'
-      - 'apps/OpenSignServer/**'
-      - 'deploy/lexysign/**'
-      - '.github/workflows/lexysign-deploy.yml'
+      - "apps/OpenSign/**"
+      - "apps/OpenSignServer/**"
+      - "deploy/lexysign/**"
+      - ".github/workflows/lexysign-deploy.yml"
   workflow_dispatch:
     inputs:
       environment:
@@ -182,7 +182,9 @@ jobs:
           if [[ "$TARGET" == "production" ]] && docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
             # The Caddyfile is shared production edge config. Staging deploys must not overwrite or reload it.
             cp Caddyfile /opt/lexysign/deploy/lexysign/Caddyfile
-            docker network connect "$NETWORK_NAME" lexysign-caddy 2>/dev/null || true
+            for network in "$NETWORK_NAME" "${UTS_INGESTION_NETWORK:-infra_default}"; do
+              docker network connect "$network" lexysign-caddy 2>/dev/null || true
+            done
             docker exec lexysign-caddy caddy validate --config /etc/caddy/Caddyfile
             docker exec lexysign-caddy caddy reload --config /etc/caddy/Caddyfile
           elif [[ "$TARGET" != "production" ]]; then
