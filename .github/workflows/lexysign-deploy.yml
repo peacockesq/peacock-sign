@@ -4,10 +4,10 @@ on:
   push:
     branches: [staging, main]
     paths:
-      - 'apps/OpenSign/**'
-      - 'apps/OpenSignServer/**'
-      - 'deploy/lexysign/**'
-      - '.github/workflows/lexysign-deploy.yml'
+      - "apps/OpenSign/**"
+      - "apps/OpenSignServer/**"
+      - "deploy/lexysign/**"
+      - ".github/workflows/lexysign-deploy.yml"
   workflow_dispatch:
     inputs:
       environment:
@@ -192,7 +192,7 @@ jobs:
           fi
           if docker ps --format '{{.Names}}' | grep -qx lexysign-caddy; then
             # Caddyfile is already staged in $DEPLOY_PATH/deploy/lexysign and mounted by the caddy service.
-            for network in "$NETWORK_NAME" lexysign_lexysign lexysign-staging_lexysign lexy-filing-staging_lexy-staging lexycorpus_default; do
+            for network in "$NETWORK_NAME" lexysign_lexysign lexysign-staging_lexysign lexy-filing-staging_lexy-staging lexycorpus_default "${UTS_INGESTION_NETWORK:-infra_default}"; do
               docker network connect "$network" lexysign-caddy 2>/dev/null || true
             done
             docker exec lexysign-caddy caddy validate --config /etc/caddy/Caddyfile
