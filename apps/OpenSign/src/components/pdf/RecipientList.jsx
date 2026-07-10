@@ -144,7 +144,7 @@ const RecipientList = (props) => {
                     ? "pointer-events-none bg-opacity-80"
                     : `text-[12px] font-bold ${cursor}`
                   : props.isMailSend && "pointer-events-none bg-opacity-80"
-              } flex flex-row rounded-xl px-2 py-[10px] mt-1 mx-1 items-center last:mb-0.5`}
+              } flex flex-row rounded-xl px-2 py-[10px] mt-1 mx-1 items-center last:mb-0.5 min-w-0`}
               style={{
                 background:
                   (!isMobile && isHover === ind) || props.uniqueId === obj.Id
@@ -155,7 +155,7 @@ const RecipientList = (props) => {
               }}
               onClick={(e) => handleSelectRecipient(e, ind, obj)}
             >
-              <div className="flex flex-row items-center w-full overflow-hidden pr-2">
+              <div className="flex flex-row items-center w-full min-w-0 overflow-hidden pr-2">
                 <div
                   className="flex flex-shrink-0 w-[30px] h-[30px] rounded-full items-center justify-center mr-2"
                   style={{
@@ -175,7 +175,7 @@ const RecipientList = (props) => {
                 <div
                   className={`${obj.Name ? "flex-col" : "flex-row"} ${
                     isSelected(ind) ? "text-[#424242]" : "text-base-content"
-                  } flex overflow-hidden flex-grow-0`}
+                  } flex overflow-hidden flex-1 min-w-0`}
                 >
                   {obj.Name ? (
                     <span className="text-[12px] font-bold truncate whitespace-nowrap">
