@@ -192,16 +192,18 @@ function Header(props) {
           id="navbar"
           className="stickyHead touch-none"
           style={{
-            width: window.innerWidth + "px"
+            width: "100%"
           }}
         >
-          <div className="flex justify-between items-center py-[5px] pl-[10px] ">
-            <div onClick={() => window.history.go(-2)}>
-              <i
-                className="fa-light fa-arrow-left text-base-content"
-                aria-hidden="true"
-              ></i>
-            </div>
+          <div className="flex justify-between items-center gap-2 py-[6px] px-[10px] w-full min-w-0">
+            <button
+              type="button"
+              onClick={() => window.history.go(-2)}
+              className="op-btn op-btn-ghost min-h-9 h-9 w-9 min-w-9 p-0 text-base-content"
+              aria-label="Back"
+            >
+              <span aria-hidden="true" className="text-[24px] leading-none">←</span>
+            </button>
             <PrevNext
               pageNumber={props?.pageNumber}
               allPages={props?.allPages}
@@ -287,22 +289,24 @@ function Header(props) {
                 </DropdownMenu.Portal>
               </DropdownMenu.Root>
             ) : (
-              <div className="flex justify-around items-center">
+              <div className="flex justify-end items-center gap-2 min-w-0">
                 {/* current signer is checking user send request and check status of pdf sign than if current 
                 user exist than show finish button else no
                 */}
                 {props?.currentSigner && (
-                  <div className="flex items-center" data-tut="reactourFifth">
+                  <div className="flex items-center justify-end gap-2" data-tut="reactourFifth">
                     {props?.decline && (
-                      <div
+                      <button
+                        type="button"
                         onClick={() => handleDeclinePdfAlert()}
-                        className="text-[red] border-none font-[650] text-[14px] mr-2"
+                        className="border-none bg-transparent p-0 text-[red] font-[650] text-[14px] whitespace-nowrap"
                       >
                         {t("decline")}
-                      </div>
+                      </button>
                     )}
                     {props?.isPlaceholder ? (
-                      <div
+                      <button
+                        type="button"
                         onClick={() => {
                           if (!props?.isMailSend) {
                             props?.handleSaveDoc();
@@ -310,21 +314,22 @@ function Header(props) {
                         }}
                         className={`${
                           props?.isMailSend ? "" : "op-link-primary"
-                        } op-link no-underline font-[650] text-[14px]`}
+                        } op-link no-underline font-[650] text-[14px] whitespace-nowrap bg-transparent border-none p-0`}
                         data-tut="headerArea"
                       >
                         {props?.completeBtnTitle
                           ? props?.completeBtnTitle
                           : t("send")}
-                      </div>
+                      </button>
                     ) : (
-                      <div
+                      <button
+                        type="button"
                         data-tut="reactourThird"
                         onClick={() => props?.embedWidgetsData()}
-                        className="border-none font-[650] text-[14px] op-link op-link-primary no-underline"
+                        className="border-none font-[650] text-[14px] op-link op-link-primary no-underline whitespace-nowrap bg-transparent p-0"
                       >
                         {t("finish")}
-                      </div>
+                      </button>
                     )}
                     <input
                       type="file"
@@ -335,11 +340,8 @@ function Header(props) {
                     />
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger asChild>
-                        <div className="font-[650] text-[18px] px-3  text-base-content no-underline">
-                          <i
-                            className="fa-light fa-ellipsis-v"
-                            aria-hidden="true"
-                          ></i>
+                        <div className="font-[650] text-[18px] text-base-content no-underline min-h-9 h-9 w-9 min-w-9 flex items-center justify-center">
+                          <span aria-hidden="true" className="text-[22px] leading-none">⋮</span>
                         </div>
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Portal>

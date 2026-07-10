@@ -11,11 +11,13 @@ function SignerListPlace(props) {
   };
   return (
     <div>
-      <div className="mx-2 pr-2 pt-2 pb-1 text-[15px] text-base-content font-semibold border-b-[1px] border-base-300">
-        <span className="relative">
+      <div className="mx-2 pr-2 pt-2 pb-1 text-[15px] text-base-content font-semibold border-b-[1px] border-base-300 min-w-0">
+        <span className="relative inline-flex items-center gap-1 min-w-0 max-w-full">
           {props.title ? props.title : "Recipients"}
-          <sup onClick={() => props.setIsTour && props.setIsTour(true)}>
-            <i className="ml-1 cursor-pointer fa-light fa-question rounded-full border-[1px] border-base-content text-[11px] py-[1px] px-[3px]"></i>
+          <sup onClick={() => props.setIsTour && props.setIsTour(true)} className="leading-none">
+            <span className="inline-flex cursor-pointer rounded-full border border-base-content w-4 h-4 items-center justify-center text-[11px] font-bold leading-none" aria-label="Help">
+              ?
+            </span>
           </sup>
           {/* <span className="absolute text-xs z-[30] mt-1 ml-0.5">
             {props?.title === "Roles" && (
@@ -40,7 +42,7 @@ function SignerListPlace(props) {
           </span> */}
         </span>
       </div>
-      <div className="overflow-auto hide-scrollbar max-h-[180px]">
+      <div className="overflow-auto hide-scrollbar max-h-[180px] min-w-0">
         <RecipientList {...props} />
       </div>
       <div className="mx-1">

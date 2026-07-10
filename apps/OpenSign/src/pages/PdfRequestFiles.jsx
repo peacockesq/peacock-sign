@@ -1919,7 +1919,7 @@ function PdfRequestFiles(
                   signedUrl={pdfDetails?.[0]?.SignedUrl || ""}
                 />
                 {/* pdf render view */}
-                <div className="w-full md:w-[57%] flex mr-4">
+                <div className="w-full md:flex-1 md:min-w-0 flex mr-4">
                   <PdfTools
                     clickOnZoomIn={clickOnZoomIn}
                     clickOnZoomOut={clickOnZoomOut}
@@ -2129,7 +2129,7 @@ function PdfRequestFiles(
                   </div>
                 </div>
 
-                <div className="w-full md:w-[23%] bg-base-100 overflow-y-auto hide-scrollbar ">
+                <div className="w-full md:w-[23%] md:min-w-[14rem] bg-base-100 overflow-y-auto hide-scrollbar ">
                   <div className={`max-h-screen`}>
                     <div className="w-full hidden md:inline-block">
                       {signedSigners.length > 0 && (
