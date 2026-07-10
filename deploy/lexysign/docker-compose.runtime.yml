@@ -97,12 +97,16 @@ services:
     networks:
       - lexysign
       - uts-ingestion
+      - docassemble-lexy-v2
 
 networks:
   lexysign:
     driver: bridge
   uts-ingestion:
     name: ${UTS_INGESTION_NETWORK:-infra_default}
+    external: true
+  docassemble-lexy-v2:
+    name: ${DOCASSEMBLE_LEXY_V2_NETWORK:-docassemble-lexy-v2_default}
     external: true
 
 volumes:
