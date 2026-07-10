@@ -415,7 +415,7 @@ option {
   }
 
   #navbar {
-    overflow: hidden;
+    overflow: visible;
     z-index: 49;
   }
 
