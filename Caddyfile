@@ -5,3 +5,16 @@
             rewrite * {uri}
     }
 }
+
+# BEGIN APIARY FOUNDRY STATIC SITE — canonical production route
+# Keep this block when regenerating/redeploying the shared Caddyfile.
+apiaryfoundry.com, www.apiaryfoundry.com {
+  encode zstd gzip
+  reverse_proxy 172.19.0.7:8080
+}
+
+staging.apiaryfoundry.com {
+  encode zstd gzip
+  reverse_proxy 172.19.0.6:8080
+}
+# END APIARY FOUNDRY STATIC SITE
