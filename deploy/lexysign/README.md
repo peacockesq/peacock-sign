@@ -29,7 +29,8 @@
 - `apps/OpenSign/Dockerfile.lexysign` — builds the LexySign React client from this fork, not upstream OpenSign images.
 - `apps/OpenSignServer/Dockerfile.lexysign` — builds the customized server from this fork.
 - `deploy/lexysign/docker-compose.yml` — self-contained Mongo + server + client + Caddy stack.
-- `deploy/lexysign/Caddyfile` — routes `/api/*` to server and everything else to client.
+- `deploy/lexysign/Caddyfile` — owns the shared edge routes, including `calc.lexyalgo.com` to the Asset Divider container.
+- `deploy/lexysign/verify-edge-contract.sh` — fails closed if the calc route, upstream, or shared `coolify` network contract is removed.
 - `deploy/lexysign/.env.example` — no real secrets.
 - `deploy/lexysign/lexysign-generate-env.sh` — generates `.env`, random `MASTER_KEY`, and a throwaway P12 for smoke tests.
 - `apps/OpenSignServer/cloud/customRoute/deleteAccount/deleteFileUrl.js` — guards S3 client creation so local-file deployments can start with `USE_LOCAL=true` and no object-storage credentials.

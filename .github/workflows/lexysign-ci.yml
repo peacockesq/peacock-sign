@@ -2,7 +2,6 @@ name: LexySign CI
 
 on:
   pull_request:
-    branches: [staging, main, lexysign-hetzner-prep]
     paths:
       - 'apps/OpenSign/**'
       - 'apps/OpenSignServer/**'
@@ -40,6 +39,13 @@ jobs:
           node --check apps/OpenSignServer/billing/stripeClient.js
           node --check apps/OpenSignServer/cloud/parsefunction/loginWithSupabase.js
           node --check apps/OpenSignServer/cloud/customRoute/docxtopdf.js
+      - name: Shared edge contract
+        run: |
+          deploy/lexysign/verify-edge-contract.sh
+          docker run --rm \
+            -v "$PWD/deploy/lexysign/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            caddy:2.8 \
+            caddy validate --config /etc/caddy/Caddyfile
       - name: Secret value scan on changed files
         shell: bash
         run: |
