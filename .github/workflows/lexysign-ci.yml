@@ -2,7 +2,6 @@ name: LexySign CI
 
 on:
   pull_request:
-    branches: [staging, main, lexysign-hetzner-prep]
     paths:
       - 'apps/OpenSign/**'
       - 'apps/OpenSignServer/**'
@@ -30,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -40,23 +41,42 @@ jobs:
           node --check apps/OpenSignServer/billing/stripeClient.js
           node --check apps/OpenSignServer/cloud/parsefunction/loginWithSupabase.js
           node --check apps/OpenSignServer/cloud/customRoute/docxtopdf.js
+      - name: Shared edge contract
+        run: |
+          deploy/lexysign/verify-edge-contract.sh
+          deploy/lexysign/test-edge-contract.sh
+          HOST_URL=https://sign-ci.invalid docker compose \
+            -f deploy/lexysign/docker-compose.yml config --quiet
+          HOST_URL=https://sign-ci.invalid docker compose \
+            -f deploy/lexysign/docker-compose.runtime.yml --profile edge config --quiet
+          docker run --rm \
+            -v "$PWD/deploy/lexysign/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            caddy:2.8 \
+            caddy validate --config /etc/caddy/Caddyfile
+      - name: Production dependency audits
+        run: |
+          npm audit --omit=dev --audit-level=high
+          npm --prefix apps/OpenSign audit --omit=dev --audit-level=high
+          npm --prefix apps/OpenSignServer audit --omit=dev --audit-level=high
+          npm --prefix apps/OpenSign ci --ignore-scripts --no-audit --no-fund
+          npm --prefix apps/OpenSignServer ci --ignore-scripts --no-audit --no-fund
+          npm --prefix apps/OpenSign test
+          npm --prefix apps/OpenSignServer run test:security
+          npm --prefix apps/OpenSignServer test
       - name: Secret value scan on changed files
         shell: bash
         run: |
+          deploy/lexysign/test-secret-scan.sh
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             BASE_SHA="${{ github.event.pull_request.base.sha }}"
           else
             BASE_SHA="${{ github.event.before }}"
           fi
           if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
-            BASE_SHA="${{ github.sha }}^"
+            BASE_SHA="$(git hash-object -t tree /dev/null)"
           fi
-          git diff --name-only "$BASE_SHA" "${{ github.sha }}" \
-            | grep -Ev '(^|/)(package-lock\.json|.*\.png|.*\.ico)$' \
-            > /tmp/changed-files.txt || true
-          if [[ -s /tmp/changed-files.txt ]]; then
-            ! xargs grep -nE 'AKIA[0-9A-Z]{16}|-----BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY-----|sk_live_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{20,}|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}' < /tmp/changed-files.txt
-          fi
+          deploy/lexysign/scan-changed-files-for-secrets.sh \
+            "$BASE_SHA" "${{ github.sha }}"
 
   docker-build:
     runs-on: ubuntu-latest

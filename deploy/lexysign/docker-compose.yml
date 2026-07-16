@@ -85,10 +85,14 @@ services:
       - lexysign-caddy-config:/config
     networks:
       - lexysign
+      - coolify
 
 networks:
   lexysign:
     driver: bridge
+  coolify:
+    name: coolify
+    external: true
 
 volumes:
   lexysign-mongo:

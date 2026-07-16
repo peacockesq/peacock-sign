@@ -106,7 +106,7 @@ export const config = {
   databaseURI:
     process.env.DATABASE_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/dev',
   cloud: function () {
-    import('./cloud/main.js');
+    return import('./cloud/main.js');
   },
   appId: serverAppId,
   logLevel: ['error'],
@@ -123,7 +123,6 @@ export const config = {
   allowExpiredAuthDataToken: false,
   enableInsecureAuthAdapters: false,
   databaseOptions: { allowPublicExplain: false },
-  encodeParseObjectInCloudFunction: true,
   ...(isMailAdapter === true
     ? {
         emailAdapter: {

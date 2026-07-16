@@ -66,10 +66,34 @@ services:
       timeout: 5s
       retries: 5
 
+  caddy:
+    image: caddy:2.8
+    container_name: lexysign-caddy
+    restart: unless-stopped
+    profiles: ["edge"]
+    depends_on:
+      - client
+      - server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - lexysign-caddy-data:/data
+      - lexysign-caddy-config:/config
+    networks:
+      - lexysign
+      - coolify
+
 networks:
   lexysign:
     driver: bridge
+  coolify:
+    name: coolify
+    external: true
 
 volumes:
   lexysign-mongo:
   lexysign-files:
+  lexysign-caddy-data:
+  lexysign-caddy-config:
