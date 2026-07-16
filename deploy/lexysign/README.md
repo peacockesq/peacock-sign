@@ -28,9 +28,9 @@
 
 - `apps/OpenSign/Dockerfile.lexysign` — builds the LexySign React client from this fork, not upstream OpenSign images.
 - `apps/OpenSignServer/Dockerfile.lexysign` — builds the customized server from this fork.
-- `deploy/lexysign/docker-compose.yml` — self-contained Mongo + server + client + Caddy stack.
+- `deploy/lexysign/docker-compose.yml` — Mongo + server + client + shared Caddy stack; both this build path and the runtime compose path require the existing external Docker network named `coolify` because the shared Caddyfile routes Asset Divider.
 - `deploy/lexysign/Caddyfile` — owns the shared edge routes, including `calc.lexyalgo.com` to the Asset Divider container.
-- `deploy/lexysign/verify-edge-contract.sh` — fails closed if the calc route, upstream, or shared `coolify` network contract is removed.
+- `deploy/lexysign/verify-edge-contract.sh` — fails closed if any calc/Asset Divider hostname, the exact upstream, or either supported compose path's shared `coolify` network contract is removed.
 - `deploy/lexysign/.env.example` — no real secrets.
 - `deploy/lexysign/lexysign-generate-env.sh` — generates `.env`, random `MASTER_KEY`, and a throwaway P12 for smoke tests.
 - `apps/OpenSignServer/cloud/customRoute/deleteAccount/deleteFileUrl.js` — guards S3 client creation so local-file deployments can start with `USE_LOCAL=true` and no object-storage credentials.
@@ -60,6 +60,8 @@ cd deploy/lexysign
 HOST_URL=https://sign.lexyalgo.com bash ./lexysign-generate-env.sh
 # edit .env for Supabase, Stripe, and SMTP before any real users
 # point DNS A record for sign.lexyalgo.com -> 37.27.49.209 before Caddy certificate issuance
+# the existing external network is part of the shared-edge runtime contract
+docker network inspect coolify >/dev/null
 docker compose up -d --build
 ```
 

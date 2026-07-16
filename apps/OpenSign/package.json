@@ -26,7 +26,7 @@
     "@usewaypoint/block-text": "^0.0.7",
     "@usewaypoint/document-core": "^0.0.6",
     "@usewaypoint/email-builder": "^0.0.9",
-    "axios": "^1.13.6",
+    "axios": "^1.18.1",
     "date-fns-tz": "^3.2.0",
     "dompurify": "^3.3.3",
     "file-saver": "^2.0.5",
@@ -62,7 +62,7 @@
     "react-quill-new": "^3.8.3",
     "react-redux": "^9.2.0",
     "react-rnd": "^10.5.3",
-    "react-router": "^7.13.1",
+    "react-router": "^7.15.1",
     "react-scrollbars-custom": "^4.1.1",
     "react-select": "^5.10.2",
     "react-signature-canvas": "^1.1.0-alpha.2",
@@ -87,6 +87,7 @@
     "version-win": "powershell -Command \"Invoke-RestMethod -Uri 'https://api.github.com/repos/opensignlabs/opensign/releases/latest' | Select-Object -ExpandProperty tag_name | Out-File -FilePath ./public/version.txt\"",
     "build-win": "npm run version-win && vite build",
     "test": "vitest run",
+    "test:security": "vitest run dependency-security.test.mjs",
     "test:watch": "vitest",
     "release": "standard-version",
     "commit": "cz"
@@ -149,9 +150,17 @@
   "overrides": {
     "tmp": "$tmp",
     "react": "$react",
-    "react-dom": "$react-dom"
+    "react-dom": "$react-dom",
+    "fast-uri": "^3.1.2",
+    "form-data": "^4.0.6",
+    "lodash-es": "^4.17.24",
+    "protobufjs": "^7.6.3",
+    "cheerio": {
+      "undici": "^6.27.0"
+    },
+    "ws": "^8.21.0"
   },
   "engines": {
-    "node": "18 || 20 || 22"
+    "node": ">=20.19.0 <21 || >=22.13.0 <23 || >=24.11.0 <25"
   }
 }
