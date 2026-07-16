@@ -62,6 +62,16 @@ sign.peacockesq.com {
   reverse_proxy opensign-test-client:3000
 }
 
+atlas.lexyalgo.com {
+  encode zstd gzip
+  reverse_proxy atlas-shell:3000
+}
+
+calc.lexyalgo.com, assetdivider.lexyalgo.com, asset-divider.lexyalgo.com {
+  encode zstd gzip
+  reverse_proxy asset-divider:3000
+}
+
 ingest.lexyalgo.com {
   encode zstd gzip
 
